@@ -11,9 +11,17 @@ public class Parser {
     }
 
     public void parse () {
-        expr();
+        letStatement();
     }
-
+    void letStatement () {
+        match(TokenType.LET);
+        var id = currentToken.lexeme;
+        match(TokenType.IDENT);
+        match(TokenType.EQ);
+        expr();
+        System.out.println("pop "+id);
+        match(TokenType.SEMICOLON);
+    }
     private void match(TokenType t) {
         if (currentToken.type == t) {
             nextToken();
@@ -23,34 +31,45 @@ public class Parser {
     }
 
     void expr() {
-        number();
+        term();
+
         oper();
     }
-
+    void term () {
+        if (currentToken.type == TokenType.NUMBER)
+            number();
+        else if (currentToken.type == TokenType.IDENT) {
+            System.out.println("push "+currentToken.lexeme);
+            match(TokenType.IDENT);
+        }
+        else
+            throw new Error("syntax error");
+    }
     void number () {
         System.out.println("push " + currentToken.lexeme);
         match(TokenType.NUMBER);
     }
 
     void oper () {
+
         if (currentToken.type == TokenType.PLUS) {
             match(TokenType.PLUS);
-            number();
+            term();
             System.out.println("add");
             oper();
         } else if (currentToken.type == TokenType.MINUS) {
             match(TokenType.MINUS);
-            number();
+            term();
             System.out.println("sub");
             oper();
         } else if(currentToken.type == TokenType.VEZES){
             match(TokenType.VEZES);
-            number();
+            term();
             System.out.println("vezes");
             oper();
         } else if(currentToken.type == TokenType.DIV){
             match(TokenType.DIV);
-            number();
+            term();
             System.out.println("divid");
             oper();
         }

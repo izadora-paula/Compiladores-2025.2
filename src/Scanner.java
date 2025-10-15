@@ -10,6 +10,7 @@ public class Scanner {
     static {
         keywords = new HashMap<>();
         keywords.put("let",    TokenType.LET);
+        keywords.put("print",    TokenType.PRINT);
     }
 
 

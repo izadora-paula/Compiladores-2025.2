@@ -10,95 +10,139 @@ public class Parser {
         currentToken = scan.nextToken();
     }
 
-    public void parse () {
-        statements();
+    /*Foi feita uma grande alteração em parser para permitir que o retorno fosse uma string
+    * para poder passar para o interpretador */
+    public String parse() {
+        return statements();
     }
 
-    void statements () {
+    // statements passou a ser do tipo string
+
+    String statements() {
+        StringBuilder result = new StringBuilder();
 
         while (currentToken.type != TokenType.EOF) {
-            statement();
+            result.append(statement());
         }
+
+        return result.toString();
     }
 
-    void statement () {
-        System.out.println(currentToken);
+    String statement() {
+        StringBuilder result = new StringBuilder();
+
+        // adiciona o token atual à string
+        result.append(currentToken.toString()).append("\n");
+
         if (currentToken.type == TokenType.PRINT) {
-            printStatement();
+            result.append(printStatement());
         } else if (currentToken.type == TokenType.LET) {
-            letStatement();
+            result.append(letStatement());
         } else {
             throw new Error("syntax error");
         }
+
+        return result.toString();
     }
 
-    void letStatement () {
+    String letStatement() {
+        StringBuilder result = new StringBuilder();
+
         match(TokenType.LET);
         var id = currentToken.lexeme;
         match(TokenType.IDENT);
         match(TokenType.EQ);
-        expr();
-        System.out.println("pop "+id);
+
+        // adiciona a expressão processada à string
+        result.append(expr());
+
+        // adiciona o comando de atribuição
+        result.append("pop ").append(id).append("\n");
         match(TokenType.SEMICOLON);
+
+        return result.toString();
     }
 
-    void printStatement () {
+    String printStatement() {
+        StringBuilder result = new StringBuilder();
+
         match(TokenType.PRINT);
-        expr();
-        System.out.println("print");
+
+        // adiciona a expressão processada
+        result.append(expr());
+
+        // adiciona o comando print
+        result.append("print").append("\n");
         match(TokenType.SEMICOLON);
+
+        return result.toString();
     }
 
     private void match(TokenType t) {
         if (currentToken.type == t) {
             nextToken();
-        }else {
+        } else {
             throw new Error("syntax error");
         }
     }
 
-    void expr() {
-        term();
-        oper();
+    // expr agora retorna String
+    String expr() {
+        StringBuilder result = new StringBuilder();
+        result.append(term());
+        result.append(oper());
+        return result.toString();
     }
-    void term () {
-        if (currentToken.type == TokenType.NUMBER)
-            number();
-        else if (currentToken.type == TokenType.IDENT) {
-            System.out.println("push "+currentToken.lexeme);
+
+    // term retorna String
+    String term() {
+        StringBuilder result = new StringBuilder();
+
+        if (currentToken.type == TokenType.NUMBER) {
+            result.append(number());
+        } else if (currentToken.type == TokenType.IDENT) {
+            result.append("push ").append(currentToken.lexeme).append("\n");
             match(TokenType.IDENT);
-        }
-        else
+        } else {
             throw new Error("syntax error");
-    }
-    void number () {
-        System.out.println("push " + currentToken.lexeme);
-        match(TokenType.NUMBER);
+        }
+
+        return result.toString();
     }
 
-    void oper () {
+    String number() {
+        String result = "push " + currentToken.lexeme + "\n";
+        match(TokenType.NUMBER);
+        return result;
+    }
+
+    String oper() {
+        StringBuilder result = new StringBuilder();
 
         if (currentToken.type == TokenType.PLUS) {
             match(TokenType.PLUS);
-            term();
-            System.out.println("add");
-            oper();
+            result.append(term());
+            result.append("add\n");
+            result.append(oper());
         } else if (currentToken.type == TokenType.MINUS) {
             match(TokenType.MINUS);
-            term();
-            System.out.println("sub");
-            oper();
-        } else if(currentToken.type == TokenType.VEZES){
+            result.append(term());
+            result.append("sub\n");
+            result.append(oper());
+        } else if (currentToken.type == TokenType.VEZES) {
             match(TokenType.VEZES);
-            term();
-            System.out.println("vezes");
-            oper();
-        } else if(currentToken.type == TokenType.DIV){
+            result.append(term());
+            result.append("vezes\n");
+            result.append(oper());
+        } else if (currentToken.type == TokenType.DIV) {
             match(TokenType.DIV);
-            term();
-            System.out.println("divid");
-            oper();
+            result.append(term());
+            result.append("divid\n");
+            result.append(oper());
         }
+
+        return result.toString();
     }
+
 
 }

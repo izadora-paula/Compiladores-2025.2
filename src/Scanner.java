@@ -30,6 +30,7 @@ public class Scanner {
     }
 
     public Token nextToken () {
+        skipWhitespace();
         char ch = peek();
         if (ch == '0') {
             advance();
@@ -50,6 +51,13 @@ public class Scanner {
                 return new Token (TokenType.EOF,"EOF");
             default:
                 throw new Error("lexical error at " + ch);
+        }
+    }
+    private void skipWhitespace() {
+        char ch = peek();
+        while (ch == ' ' || ch == '\r' || ch == '\t' || ch == '\n') {
+            advance();
+            ch = peek();
         }
     }
 
